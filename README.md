@@ -1,71 +1,124 @@
 # PromptPay QR Code Generator
 
-This project provides a simple and effective tool to generate PromptPay QR codes for receiving payments in Thailand. It comes in two flavors: a server-side PHP version and a client-side HTML/JavaScript version.
+A simple and effective tool to generate PromptPay QR codes for receiving payments in Thailand. This standalone PHP application requires zero dependencies and uses the goQR.me API for QR code generation.
 
 Users can input a PromptPay target (phone number, National ID/Tax ID, or e-Wallet ID) and an optional amount to instantly generate a scannable QR code.
 
-## Features
+## ✨ Features
 
-| Feature | PHP Version | HTML/JS Version |
-| :--- | :---: | :---: |
-| **QR Code Generation** | Server-side (PNG) | Client-side (Canvas) |
-| **Dependencies** | `kittinan/php-promptpay-qr` | `qrcode.js` (CDN) |
-| **Input Validation** | ✅ | ✅ |
-| **Supports Phone, Tax ID, e-Wallet** | ✅ | ✅ |
-| **Optional Amount** | ✅ | ✅ |
-| **Real-time QR Generation** | ✅ | ✅ |
-| **Download QR Code** | ✅ | ❌ |
-| **Automatic File Cleanup** | ✅ | N/A |
-| **Works Offline** | ❌ | ✅ (after first load) |
-| **Responsive Design** | ✅ | ✅ |
+- ✅ **Zero Dependencies** - No Composer or external libraries required
+- ✅ **Input Validation** - Supports phone numbers, tax IDs, and e-wallet IDs
+- ✅ **Optional Amount** - Generate QR codes with or without payment amounts
+- ✅ **Real-time QR Generation** - Instant QR code creation using goQR.me API
+- ✅ **Download QR Code** - Save generated QR codes as PNG files
+- ✅ **Automatic File Cleanup** - Old QR files are automatically removed
+- ✅ **Responsive Design** - Works on desktop and mobile devices
+- ✅ **Error Handling** - Comprehensive error checking and user feedback
 
 ---
 
-## Setup and Usage
+## 🚀 Quick Start
 
-You can choose the version that best fits your needs.
+### Setup
 
-### 1. PHP Version (`promptpay-qr.php`)
+1. **Upload**: Simply upload the `index.php` file to your PHP-enabled web server
+2. **Permissions**: Ensure the directory is writable for QR code file saving:
+   ```bash
+   # Example: Set write permissions for the web server user
+   chown www-data:www-data /path/to/your/web/directory
+   chmod 755 /path/to/your/web/directory
+   ```
+3. **Access**: Open your domain/subdirectory in a web browser
 
-This version generates a `.png` image of the QR code on the server, allows users to download it, and automatically cleans up old files.
+### Requirements
 
-**Setup:**
-
-1.  **Install dependencies:** Make sure you have [Composer](https://getcomposer.org/) installed. Run the following command in your project directory:
-    ```bash
-    composer require kittinan/php-promptpay-qr
-    ```
-2.  **Deploy:** Place the `promptpay-qr.php` file and the `vendor` directory on your PHP-enabled web server.
-3.  **Permissions:** Ensure the directory where `promptpay-qr.php` resides is writable by the web server, so it can create the QR code image files.
-    ```bash
-    # Example: Set write permissions for the web server user
-    chown www-data:www-data /path/to/your/web/directory
-    chmod 755 /path/to/your/web/directory
-    ```
-4.  **Access:** Open the URL to `promptpay-qr.php` in your web browser.
-
-### 2. HTML/JavaScript Version (`promptpay.html`)
-
-This version is a single, self-contained HTML file that works entirely within the user's web browser. It's highly portable and requires no server-side processing.
-
-**Setup:**
-
-1.  **Save the file:** Simply save the code as `promptpay.html`.
-2.  **Open in browser:** Open the file directly in any modern web browser. An internet connection is needed on the first run to load the `qrcode.js` library from the CDN.
+- PHP 7.0 or higher
+- cURL extension enabled
+- Internet connection (for QR code generation via goQR.me API)
+- Writable directory for temporary QR code files
 
 ---
 
-## How It Works
+## 📱 Supported PromptPay Formats
 
-Both versions follow the EMVCo Merchant-Presented QR Code standard to generate a valid PromptPay payload string.
+| Format | Example | Description |
+|--------|---------|-------------|
+| **Phone Number** | `0899999999` or `089-999-9999` | Thai mobile phone numbers |
+| **National/Tax ID** | `1-2345-67890-12-3` | 13-digit Thai identification |
+| **e-Wallet ID** | `123456789012345` | 15+ digit e-wallet identifiers |
 
-The payload is constructed by concatenating several fields, each with a specific ID, length, and value. Key fields include:
--   **Payload Format Indicator** (ID `00`)
--   **Point-of-Initiation Method** (ID `01`): `11` for static QR (no amount), `12` for dynamic QR (with amount).
--   **Merchant Information** (ID `29`): Contains the PromptPay GUID (`A000000677010111`) and the recipient's formatted phone number, Tax ID, or e-Wallet ID.
--   **Country Code** (ID `58`): `TH` for Thailand.
--   **Transaction Currency** (ID `53`): `764` for Thai Baht.
--   **Transaction Amount** (ID `54`): The amount of the transaction, if specified.
--   **CRC Checksum** (ID `63`): A CRC-16-CCITT checksum calculated over the entire payload string to ensure data integrity.
+---
 
-This payload string is then encoded into a QR code image.
+## 🔧 How It Works
+
+The application follows the EMVCo Merchant-Presented QR Code standard to generate valid PromptPay payload strings.
+
+### Payload Structure
+
+The payload contains several standardized fields:
+
+- **Payload Format Indicator** (ID `00`): EMV standard compliance
+- **Point-of-Initiation Method** (ID `01`): Static (`11`) or Dynamic (`12`) QR codes
+- **Merchant Information** (ID `29`): PromptPay GUID and recipient details
+- **Country Code** (ID `58`): `TH` for Thailand
+- **Transaction Currency** (ID `53`): `764` for Thai Baht (THB)
+- **Transaction Amount** (ID `54`): Payment amount (if specified)
+- **CRC Checksum** (ID `63`): Data integrity verification using CRC-16-CCITT
+
+### QR Code Generation
+
+The application uses the goQR.me API (`api.qrserver.com`) with optimized parameters:
+
+- **Error Correction**: Medium level (15% data redundancy)
+- **Quiet Zone**: 1-module border for better scanning
+- **Format**: PNG with UTF-8 encoding
+- **Size**: Configurable (default 300x300 pixels)
+
+---
+
+## 🗂️ Project Structure
+
+```
+├── index.php          # Main application (standalone, zero dependencies)
+├── README.md          # This documentation
+└── qr_*.png          # Generated QR code files (auto-cleaned after 1 hour)
+```
+
+---
+
+## 🔒 Security & Privacy
+
+- **No Data Storage**: PromptPay payloads are not stored on the server
+- **Temporary Files**: QR code images are automatically deleted after 1 hour
+- **External API**: QR generation uses goQR.me API (payload data is transmitted for QR creation)
+- **Input Sanitization**: All user inputs are properly sanitized and validated
+
+---
+
+## 🚀 Deployment Tips
+
+### For Production Use
+
+1. **HTTPS**: Always use HTTPS in production for secure data transmission
+2. **Rate Limiting**: Consider implementing rate limiting to prevent abuse
+3. **Monitoring**: Monitor goQR.me API availability and response times
+4. **Backup**: Keep backups of your `index.php` file
+
+### For Development
+
+```bash
+# Quick local development with PHP built-in server
+php -S localhost:8000 index.php
+```
+
+Then visit `http://localhost:8000` in your browser.
+
+---
+
+## 🆚 Advantages Over Other Solutions
+
+- **Simplicity**: Single file deployment vs complex dependency management
+- **Reliability**: Uses established goQR.me API vs experimental solutions
+- **Maintainability**: Self-contained code vs multiple external dependencies
+- **Performance**: Direct API calls vs heavy QR generation libraries
+- **Portability**: Works on any PHP hosting vs specific server requirements
