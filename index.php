@@ -143,9 +143,119 @@ class PromptPayStandalone {
         
         return file_put_contents($savePath, $qrData);
     }
+
+    /**
+     * Generate and return QR code image data directly
+     */
+    public function generateQrCodeData($target, $amount = null, $size = 300) {
+        $qrUrl = $this->generateQrCodeUrl($target, $amount, $size);
+        
+        // Use cURL for better error handling
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $qrUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $qrData = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($qrData === false || !empty($error) || $httpCode !== 200) {
+            throw new Exception('Failed to generate QR code: ' . ($error ?: 'HTTP ' . $httpCode));
+        }
+        
+        return $qrData;
+    }
 }
 
-// Main application logic
+// API endpoint check
+if (isset($_GET['api']) && $_GET['api'] === '1') {
+    header('Content-Type: application/json');
+    
+    try {
+        // Get parameters from GET or POST
+        $target = trim($_REQUEST['target'] ?? '');
+        $amount = trim($_REQUEST['amount'] ?? '');
+        $size = intval($_REQUEST['size'] ?? 300);
+        $format = strtolower($_REQUEST['format'] ?? 'image');
+        
+        // Validate size parameter
+        if ($size < 50 || $size > 1000) {
+            $size = 300;
+        }
+        
+        // Validate required parameters
+        if (empty($target)) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Missing required parameter: target',
+                'message' => 'Please provide a phone number, tax ID, or e-wallet ID'
+            ]);
+            exit;
+        }
+        
+        $pp = new PromptPayStandalone();
+        
+        if ($format === 'image') {
+            // Return QR code image directly
+            $qrData = $pp->generateQrCodeData($target, $amount ? floatval($amount) : null, $size);
+            
+            header('Content-Type: image/png');
+            header('Content-Disposition: inline; filename="promptpay-qr.png"');
+            header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
+            echo $qrData;
+            
+        } else if ($format === 'json') {
+            // Return JSON response with payload and QR URL
+            $payload = $pp->generatePayload($target, $amount ? floatval($amount) : null);
+            $qrUrl = $pp->generateQrCodeUrl($target, $amount ? floatval($amount) : null, $size);
+            
+            echo json_encode([
+                'success' => true,
+                'payload' => $payload,
+                'qr_url' => $qrUrl,
+                'target' => $target,
+                'amount' => $amount ? floatval($amount) : null,
+                'size' => $size
+            ]);
+            
+        } else if ($format === 'base64') {
+            // Return base64 encoded image
+            $qrData = $pp->generateQrCodeData($target, $amount ? floatval($amount) : null, $size);
+            $base64 = base64_encode($qrData);
+            
+            echo json_encode([
+                'success' => true,
+                'image_base64' => 'data:image/png;base64,' . $base64,
+                'payload' => $pp->generatePayload($target, $amount ? floatval($amount) : null),
+                'target' => $target,
+                'amount' => $amount ? floatval($amount) : null,
+                'size' => $size
+            ]);
+            
+        } else {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Invalid format parameter',
+                'message' => 'Supported formats: image, json, base64'
+            ]);
+        }
+        
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Internal server error',
+            'message' => $e->getMessage()
+        ]);
+    }
+    
+    exit; // Stop execution for API calls
+}
+
+// Main application logic for web interface
 $qrCodePath = '';
 $payload = '';
 $error = '';
