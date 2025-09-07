@@ -1,20 +1,28 @@
 # PromptPay QR Code Generator
 
-A simple and effective tool to generate PromptPay QR codes for receiving payments in Thailand. This standalone PHP application requires zero dependencies and uses the goQR.me API for QR code generation.
+A modern, clean architecture tool to generate PromptPay QR codes for receiving payments in Thailand. This application features a clean separation between frontend and API, with the main interface consuming a dedicated REST API endpoint.
 
-Users can input a PromptPay target (phone number, National ID/Tax ID, or e-Wallet ID) and an optional amount to instantly generate a scannable QR code.
+Users can access the web interface for interactive QR generation or use the API directly for programmatic integration.
+
+## 🏗️ Architecture
+
+The application is structured with clean separation of concerns:
+
+- **Frontend** (`index.php`) - User-friendly web interface that consumes the API
+- **API** (`api/index.php`) - Dedicated REST API endpoint for QR code generation
+- **No Dependencies** - Both components use only built-in PHP functions and goQR.me API
 
 ## ✨ Features
 
+- ✅ **Clean Architecture** - Separated frontend and API for better maintainability
 - ✅ **Zero Dependencies** - No Composer or external libraries required
 - ✅ **Web Interface** - User-friendly form for interactive QR generation
-- ✅ **REST API** - Programmatic access for integration with other systems
+- ✅ **REST API** - Dedicated `/api/` endpoint for programmatic access
 - ✅ **Multiple Output Formats** - Image, JSON, and Base64 responses
 - ✅ **Input Validation** - Supports phone numbers, tax IDs, and e-wallet IDs
 - ✅ **Optional Amount** - Generate QR codes with or without payment amounts
 - ✅ **Real-time QR Generation** - Instant QR code creation using goQR.me API
-- ✅ **Download QR Code** - Save generated QR codes as PNG files (web interface)
-- ✅ **Automatic File Cleanup** - Old QR files are automatically removed
+- ✅ **CORS Support** - API includes proper CORS headers for cross-origin requests
 - ✅ **Responsive Design** - Works on desktop and mobile devices
 - ✅ **Error Handling** - Comprehensive error checking and user feedback
 
@@ -24,32 +32,37 @@ Users can input a PromptPay target (phone number, National ID/Tax ID, or e-Walle
 
 ### Setup
 
-1. **Upload**: Simply upload the `index.php` file to your PHP-enabled web server
-2. **Permissions**: Ensure the directory is writable for QR code file saving:
-   ```bash
-   # Example: Set write permissions for the web server user
-   chown www-data:www-data /path/to/your/web/directory
-   chmod 755 /path/to/your/web/directory
+1. **Upload**: Upload both `index.php` and the `api/` folder to your PHP-enabled web server
+2. **Directory Structure**:
    ```
-3. **Access**: Open your domain/subdirectory in a web browser
+   your-domain.com/
+   ├── index.php          # Frontend web interface
+   └── api/
+       └── index.php      # REST API endpoint
+   ```
+3. **Access**: 
+   - Web Interface: `https://your-domain.com/`
+   - API Endpoint: `https://your-domain.com/api/`
 
 ### Requirements
 
 - PHP 7.0 or higher
 - cURL extension enabled
 - Internet connection (for QR code generation via goQR.me API)
-- Writable directory for temporary QR code files (web interface only)
 
 ---
 
 ## 🔌 API Documentation
 
-The application provides a REST API for programmatic access to QR code generation.
+The application provides a clean REST API at `/api/` for programmatic access to QR code generation.
 
 ### Base URL
 ```
-https://yourdomain.com/index.php?api=1
+https://your-domain.com/api/
 ```
+
+### Endpoint
+The API responds to both GET and POST requests at the base URL.
 
 ### Parameters
 
@@ -67,7 +80,7 @@ Returns the QR code as a PNG image directly.
 
 ```bash
 # Example: Get QR code image
-curl "https://yourdomain.com/index.php?api=1&target=0899999999&amount=100.50" \
+curl "https://your-domain.com/api/?target=0899999999&amount=100.50" \
   --output qr-code.png
 ```
 
@@ -79,7 +92,7 @@ Returns structured data with payload and QR URL.
 
 ```bash
 # Example: Get JSON response
-curl "https://yourdomain.com/index.php?api=1&target=0899999999&amount=100.50&format=json"
+curl "https://your-domain.com/api/?target=0899999999&amount=100.50&format=json"
 ```
 
 **Response**:
@@ -99,7 +112,7 @@ Returns the QR code as a base64-encoded image.
 
 ```bash
 # Example: Get base64 response
-curl "https://yourdomain.com/index.php?api=1&target=0899999999&format=base64"
+curl "https://your-domain.com/api/?target=0899999999&format=base64"
 ```
 
 **Response**:
@@ -118,16 +131,16 @@ curl "https://yourdomain.com/index.php?api=1&target=0899999999&format=base64"
 
 ```bash
 # Phone number without amount
-curl "https://yourdomain.com/index.php?api=1&target=0899999999"
+curl "https://your-domain.com/api/?target=0899999999"
 
 # Phone number with amount
-curl "https://yourdomain.com/index.php?api=1&target=089-999-9999&amount=150.75"
+curl "https://your-domain.com/api/?target=089-999-9999&amount=150.75"
 
 # Tax ID with custom size
-curl "https://yourdomain.com/index.php?api=1&target=1-2345-67890-12-3&size=500&format=json"
+curl "https://your-domain.com/api/?target=1-2345-67890-12-3&size=500&format=json"
 
 # e-Wallet ID as base64
-curl "https://yourdomain.com/index.php?api=1&target=123456789012345&format=base64"
+curl "https://your-domain.com/api/?target=123456789012345&format=base64"
 ```
 
 ### Error Responses
@@ -200,7 +213,7 @@ The application uses the goQR.me API (`api.qrserver.com`) with optimized paramet
 The `index.php` file serves dual purposes:
 
 1. **Web Interface** (default): User-friendly form at `https://yourdomain.com/`
-2. **REST API**: Programmatic access at `https://yourdomain.com/index.php?api=1`
+2. **REST API**: Programmatic access at `https://your-domain.com/api/`
 
 ---
 
@@ -226,14 +239,28 @@ The `index.php` file serves dual purposes:
 
 ```bash
 # Quick local development with PHP built-in server
-php -S localhost:8000 index.php
+php -S localhost:8080
 
-# Test the web interface
-# Visit: http://localhost:8000
+# Test the frontend
+# Visit: http://localhost:8080
 
-# Test the API
-curl "http://localhost:8000/index.php?api=1&target=0899999999&format=json"
+# Test the API directly
+curl "http://localhost:8080/api/?target=0899999999&format=json"
+
+# Test the API with different formats
+curl "http://localhost:8080/api/?target=0891234567&amount=100&format=image" --output qr.png
+curl "http://localhost:8080/api/?target=0891234567&amount=100&format=base64"
 ```
+
+## 📁 File Structure
+
+```
+├── index.php          # Frontend web interface
+└── api/
+    └── index.php      # REST API endpoint
+```
+
+The frontend (`index.php`) provides a user-friendly web interface that internally calls the API (`api/index.php`) to generate QR codes. The API can also be used directly for programmatic access.
 
 ---
 
