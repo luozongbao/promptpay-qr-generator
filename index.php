@@ -125,7 +125,7 @@ if ($_POST) {
             text-align: center;
             margin-top: 30px;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #1A3763;
             border-radius: 5px;
         }
         .qr-image {
@@ -246,15 +246,14 @@ if ($_POST) {
 
         <?php if ($qrCodeUrl): ?>
             <div class="qr-container">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="assets/images/promptpay-logo.svg" alt="PromptPay Logo" style="height: 40px;">
-                </div>
                 <img src="<?= htmlspecialchars($qrCodeUrl) ?>" alt="PromptPay QR Code" class="qr-image">
                 <br>
                 <?php if ($qrCodePath && file_exists($qrCodePath)): ?>
                     <a href="<?= htmlspecialchars($qrCodePath) ?>" download class="download-btn">Download QR Code</a>
                 <?php endif; ?>
-                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="assets/images/thai-qr-payment.svg" alt="PromptPay Logo" style="height: 40px;">
+                </div>
                 <?php if ($payload): ?>
                     <div class="payload-info">
                         <strong>Payload:</strong><br><?= htmlspecialchars($payload) ?>
