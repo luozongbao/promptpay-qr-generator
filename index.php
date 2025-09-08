@@ -246,7 +246,9 @@ if ($_POST) {
 
         <?php if ($qrCodeUrl): ?>
             <div class="qr-container">
-                <h3>Your PromptPay QR Code</h3>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="assets/images/promptpay-logo.svg" alt="PromptPay Logo" style="height: 40px;">
+                </div>
                 <img src="<?= htmlspecialchars($qrCodeUrl) ?>" alt="PromptPay QR Code" class="qr-image">
                 <br>
                 <?php if ($qrCodePath && file_exists($qrCodePath)): ?>
