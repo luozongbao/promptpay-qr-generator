@@ -1,276 +1,279 @@
 # PromptPay QR Code Generator
 
-A modern, clean architecture tool to generate PromptPay QR codes for receiving payments in Thailand. This application features a clean separation between frontend and API, with the main interface consuming a dedicated REST API endpoint.
+A professional Thai PromptPay QR Code generator with a clean web interface and REST API. Generate QR codes for payments using phone numbers, tax IDs, or e-wallet IDs with optional amounts.
 
-Users can access the web interface for interactive QR generation or use the API directly for programmatic integration.
+## 🌟 Features
 
-## 🏗️ Architecture
-
-The application is structured with clean separation of concerns:
-
-- **Frontend** (`index.php`) - User-friendly web interface that consumes the API
-- **API** (`api/index.php`) - Dedicated REST API endpoint for QR code generation
-- **No Dependencies** - Both components use only built-in PHP functions and goQR.me API
-
-## ✨ Features
-
-- ✅ **Clean Architecture** - Separated frontend and API for better maintainability
 - ✅ **Zero Dependencies** - No Composer or external libraries required
-- ✅ **Web Interface** - User-friendly form for interactive QR generation
-- ✅ **REST API** - Dedicated `/api/` endpoint for programmatic access
-- ✅ **Multiple Output Formats** - Image, JSON, and Base64 responses
-- ✅ **Input Validation** - Supports phone numbers, tax IDs, and e-wallet IDs
-- ✅ **Optional Amount** - Generate QR codes with or without payment amounts
-- ✅ **Real-time QR Generation** - Instant QR code creation using goQR.me API
-- ✅ **CORS Support** - API includes proper CORS headers for cross-origin requests
-- ✅ **Responsive Design** - Works on desktop and mobile devices
-- ✅ **Error Handling** - Comprehensive error checking and user feedback
+- ✅ **Clean Architecture** - Separated frontend and API
+- ✅ **Multiple Input Types** - Phone numbers, tax IDs, e-wallet IDs
+- ✅ **Optional Amounts** - Generate QR codes with or without payment amounts
+- ✅ **Professional UI** - Responsive design with PromptPay branding
+- ✅ **REST API** - Easy integration with other applications
+- ✅ **Multiple Output Formats** - Image, JSON, Base64
+- ✅ **CORS Enabled** - Cross-origin request support
+- ✅ **Mobile Friendly** - Works on all devices
 
----
+## 📁 Project Structure
+
+```
+├── index.php                          # Frontend web interface
+├── api/
+│   └── index.php                      # REST API endpoint
+├── assets/
+│   └── images/
+│       └── promptpay-logo.svg         # PromptPay official logo
+│       └── thai-qr-payment.svg        # PromptPay official logo
+└── README.md                          # Documentation
+```
 
 ## 🚀 Quick Start
 
-### Setup
-
-1. **Upload**: Upload both `index.php` and the `api/` folder to your PHP-enabled web server
-2. **Directory Structure**:
-   ```
-   your-domain.com/
-   ├── index.php          # Frontend web interface
-   └── api/
-       └── index.php      # REST API endpoint
-   ```
-3. **Access**: 
-   - Web Interface: `https://your-domain.com/`
-   - API Endpoint: `https://your-domain.com/api/`
-
 ### Requirements
-
 - PHP 7.0 or higher
-- cURL extension enabled
+- Web server (Apache, Nginx, or PHP built-in server)
 - Internet connection (for QR code generation via goQR.me API)
 
----
+### Installation
+1. **Download or clone** the project files
+2. **Upload to your web server** or run locally
+3. **Set proper permissions** (755 for directories, 644 for files)
+4. **Access the application** via your web browser
 
-## 🔌 API Documentation
+### Local Development
+```bash
+# Navigate to project directory
+cd /path/to/promptpay-generator
 
-The application provides a clean REST API at `/api/` for programmatic access to QR code generation.
+# Start PHP development server
+php -S localhost:8000
+
+# Open in browser
+open http://localhost:8000
+```
+
+## 🖥️ Web Interface
+
+The main interface (`index.php`) provides:
+- **User-friendly form** for entering PromptPay details
+- **Real-time QR code generation** using the internal API
+- **PromptPay logo branding** for professional appearance
+- **Download functionality** for generated QR codes
+- **API documentation** section for developers
+
+### Supported PromptPay Formats
+
+| Type | Format | Example |
+|------|--------|---------|
+| **Mobile Phone** | 10 digits starting with 0 | `0812345678` |
+| **Tax ID** | 13 digits | `1234567890123` |
+| **e-Wallet ID** | 15 digits | `123456789012345` |
+
+## 🔌 REST API
 
 ### Base URL
 ```
-https://your-domain.com/api/
+https://yourdomain.com/api/
 ```
-
-### Endpoint
-The API responds to both GET and POST requests at the base URL.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `target` | string | Yes | Phone number, Tax ID, or e-Wallet ID |
-| `amount` | float | No | Payment amount in THB |
-| `size` | integer | No | QR code size in pixels (50-1000, default: 300) |
-| `format` | string | No | Response format: `image`, `json`, `base64` (default: `image`) |
+| `target` | string | ✅ Yes | Phone number, Tax ID, or e-Wallet ID |
+| `amount` | float | ❌ No | Payment amount in Thai Baht |
+| `size` | integer | ❌ No | QR code size in pixels (50-1000, default: 300) |
+| `format` | string | ❌ No | Response format: `image`, `json`, `base64` |
 
 ### Response Formats
 
-#### 1. Image Format (default)
-Returns the QR code as a PNG image directly.
+#### 1. Image Format (Default)
+Returns PNG image directly with proper headers.
 
 ```bash
-# Example: Get QR code image
-curl "https://your-domain.com/api/?target=0899999999&amount=100.50" \
+curl "https://yourdomain.com/api/?target=0812345678&amount=100.50" \
   --output qr-code.png
 ```
 
-**Response**: PNG image file
-**Content-Type**: `image/png`
-
 #### 2. JSON Format
-Returns structured data with payload and QR URL.
+Returns structured data with PromptPay payload and QR URL.
 
 ```bash
-# Example: Get JSON response
-curl "https://your-domain.com/api/?target=0899999999&amount=100.50&format=json"
+curl "https://yourdomain.com/api/?target=0812345678&amount=100.50&format=json"
 ```
 
-**Response**:
+**Response:**
 ```json
 {
   "success": true,
-  "payload": "00020101021229370016A000000677010111011300668999999995802TH53037645406100.5063048888",
-  "qr_url": "https://api.qrserver.com/v1/create-qr-code/...",
-  "target": "0899999999",
-  "amount": 100.5,
+  "target": "0812345678",
+  "amount": 100.50,
+  "payload": "00020101021129370016A000000677010111011300668123456785802TH5303764540610...",
+  "qr_url": "https://api.qrserver.com/v1/create-qr-code/?data=00020101...",
   "size": 300
 }
 ```
 
 #### 3. Base64 Format
-Returns the QR code as a base64-encoded image.
+Returns base64-encoded image with metadata.
 
 ```bash
-# Example: Get base64 response
-curl "https://your-domain.com/api/?target=0899999999&format=base64"
+curl "https://yourdomain.com/api/?target=0812345678&format=base64"
 ```
 
-**Response**:
+**Response:**
 ```json
 {
   "success": true,
-  "image_base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-  "payload": "00020101021129370016A000000677010111011300668999999995802TH53037646304FE29",
-  "target": "0899999999",
+  "target": "0812345678",
   "amount": null,
+  "image_base64": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "mime_type": "image/png",
   "size": 300
 }
 ```
 
-### API Examples
-
-```bash
-# Phone number without amount
-curl "https://your-domain.com/api/?target=0899999999"
-
-# Phone number with amount
-curl "https://your-domain.com/api/?target=089-999-9999&amount=150.75"
-
-# Tax ID with custom size
-curl "https://your-domain.com/api/?target=1-2345-67890-12-3&size=500&format=json"
-
-# e-Wallet ID as base64
-curl "https://your-domain.com/api/?target=123456789012345&format=base64"
-```
-
 ### Error Responses
 
-**400 Bad Request** - Missing or invalid parameters:
+All errors return JSON with proper HTTP status codes:
+
 ```json
 {
-  "error": "Missing required parameter: target",
-  "message": "Please provide a phone number, tax ID, or e-wallet ID"
+  "error": true,
+  "message": "Target is required"
 }
 ```
 
-**500 Internal Server Error** - QR generation failed:
-```json
-{
-  "error": "Internal server error",
-  "message": "Failed to generate QR code: HTTP 500"
-}
-```
-
----
-
-## 📱 Supported PromptPay Formats
-
-| Format | Example | Description |
-|--------|---------|-------------|
-| **Phone Number** | `0899999999` or `089-999-9999` | Thai mobile phone numbers |
-| **National/Tax ID** | `1-2345-67890-12-3` | 13-digit Thai identification |
-| **e-Wallet ID** | `123456789012345` | 15+ digit e-wallet identifiers |
-
----
+**Common Error Codes:**
+- `400` - Bad Request (missing/invalid parameters)
+- `500` - Internal Server Error (QR generation failed)
 
 ## 🔧 How It Works
 
-The application follows the EMVCo Merchant-Presented QR Code standard to generate valid PromptPay payload strings.
+### PromptPay Payload Structure
+The application generates EMV-compliant PromptPay payloads with these components:
 
-### Payload Structure
-
-The payload contains several standardized fields:
-
-- **Payload Format Indicator** (ID `00`): EMV standard compliance
-- **Point-of-Initiation Method** (ID `01`): Static (`11`) or Dynamic (`12`) QR codes
-- **Merchant Information** (ID `29`): PromptPay GUID and recipient details
-- **Country Code** (ID `58`): `TH` for Thailand
-- **Transaction Currency** (ID `53`): `764` for Thai Baht (THB)
-- **Transaction Amount** (ID `54`): Payment amount (if specified)
-- **CRC Checksum** (ID `63`): Data integrity verification using CRC-16-CCITT
+1. **Payload Format Indicator** (ID 00): Version "01"
+2. **Point of Initiation** (ID 01): "12" for dynamic QR
+3. **Merchant Account Information** (ID 29): PromptPay data
+4. **Country Code** (ID 58): "TH" for Thailand
+5. **Transaction Currency** (ID 53): "764" (Thai Baht)
+6. **Transaction Amount** (ID 54): Amount in THB (if specified)
+7. **CRC16** (ID 63): Checksum for data integrity
 
 ### QR Code Generation
+- Uses **goQR.me API** for reliable QR code generation
+- **Error correction level M** (15% redundancy) for better scanning
+- **300x300 pixels** default size with customizable dimensions
+- **PNG format** for high quality and broad compatibility
 
-The application uses the goQR.me API (`api.qrserver.com`) with optimized parameters:
+## 🛡️ Security & Privacy
 
-- **Error Correction**: Medium level (15% data redundancy)
-- **Quiet Zone**: 1-module border for better scanning
-- **Format**: PNG with UTF-8 encoding
-- **Size**: Configurable (default 300x300 pixels)
+- **No data storage** - QR codes are generated on-demand
+- **External QR generation** - Uses goQR.me API (requires internet)
+- **Input validation** - Validates PromptPay formats
+- **CORS enabled** - Configurable for your domain
+- **No sensitive data logging** - Minimal server-side processing
 
----
+## 🌐 Integration Examples
 
-## 🗂️ Project Structure
-
+### JavaScript/AJAX
+```javascript
+fetch('https://yourdomain.com/api/?target=0812345678&amount=100&format=json')
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('qr-img').src = data.qr_url;
+    }
+  });
 ```
-├── index.php          # Main application with web interface and REST API
-├── README.md          # This documentation
-└── qr_*.png          # Generated QR code files (web interface, auto-cleaned after 1 hour)
+
+### PHP
+```php
+$response = file_get_contents('https://yourdomain.com/api/?target=0812345678&format=json');
+$data = json_decode($response, true);
+
+if ($data['success']) {
+    echo "QR URL: " . $data['qr_url'];
+}
 ```
 
-### Application Modes
+### Python
+```python
+import requests
 
-The `index.php` file serves dual purposes:
+response = requests.get('https://yourdomain.com/api/', params={
+    'target': '0812345678',
+    'amount': 100.50,
+    'format': 'json'
+})
 
-1. **Web Interface** (default): User-friendly form at `https://yourdomain.com/`
-2. **REST API**: Programmatic access at `https://your-domain.com/api/`
+data = response.json()
+if data['success']:
+    print(f"QR URL: {data['qr_url']}")
+```
 
----
+## 🚀 Deployment
 
-## 🔒 Security & Privacy
+### Production Setup
+1. **Upload files** to your web server
+2. **Configure web server** to serve the application
+3. **Set proper permissions** (755/644)
+4. **Test both frontend and API** endpoints
+5. **Configure CORS** if needed for cross-origin requests
 
-- **No Data Storage**: PromptPay payloads are not stored on the server
-- **Temporary Files**: QR code images are automatically deleted after 1 hour
-- **External API**: QR generation uses goQR.me API (payload data is transmitted for QR creation)
-- **Input Sanitization**: All user inputs are properly sanitized and validated
-
----
-
-## 🚀 Deployment Tips
-
-### For Production Use
-
-1. **HTTPS**: Always use HTTPS in production for secure data transmission
-2. **Rate Limiting**: Consider implementing rate limiting to prevent abuse
-3. **Monitoring**: Monitor goQR.me API availability and response times
-4. **Backup**: Keep backups of your `index.php` file
-
-### For Development
-
+### Development Setup
 ```bash
-# Quick local development with PHP built-in server
-php -S localhost:8080
+# Clone or download project
+git clone https://github.com/youruser/promptpay-qr-generator.git
+cd promptpay-qr-generator
 
-# Test the frontend
-# Visit: http://localhost:8080
+# Start development server
+php -S localhost:8000
 
-# Test the API directly
-curl "http://localhost:8080/api/?target=0899999999&format=json"
-
-# Test the API with different formats
-curl "http://localhost:8080/api/?target=0891234567&amount=100&format=image" --output qr.png
-curl "http://localhost:8080/api/?target=0891234567&amount=100&format=base64"
+# Test API endpoint
+curl "http://localhost:8000/api/?target=0812345678&format=json"
 ```
 
-## 📁 File Structure
+## 📋 API Usage Examples
 
-```
-├── index.php          # Frontend web interface
-└── api/
-    └── index.php      # REST API endpoint
+### Generate QR Code for Phone Payment
+```bash
+curl "https://yourdomain.com/api/?target=0899999999&amount=150.75" \
+  --output payment-qr.png
 ```
 
-The frontend (`index.php`) provides a user-friendly web interface that internally calls the API (`api/index.php`) to generate QR codes. The API can also be used directly for programmatic access.
+### Generate QR Code for Tax ID (No Amount)
+```bash
+curl "https://yourdomain.com/api/?target=1234567890123&format=json"
+```
+
+### Generate Large QR Code
+```bash
+curl "https://yourdomain.com/api/?target=0812345678&size=500&format=image" \
+  --output large-qr.png
+```
+
+### Get Base64 for Email/SMS
+```bash
+curl "https://yourdomain.com/api/?target=0812345678&amount=50&format=base64"
+```
+
+## 🎯 Advantages
+
+- **Self-contained** - Single file deployment for each component
+- **Modern architecture** - Clean separation of frontend and API
+- **Professional appearance** - Official PromptPay branding
+- **Developer-friendly** - Comprehensive API with multiple formats
+- **Production-ready** - Proper error handling and validation
+- **Mobile-optimized** - Responsive design for all devices
+
+## 📞 Support
+
+This PromptPay QR Code Generator follows the official Thai PromptPay specification and generates EMV-compliant QR codes compatible with all major Thai banking applications.
+
+For technical support or feature requests, please refer to the project documentation or create an issue in the project repository.
 
 ---
 
-## 🆚 Advantages Over Other Solutions
-
-- **Dual Interface**: Both web UI and REST API in a single file
-- **Simplicity**: Single file deployment vs complex dependency management
-- **Flexibility**: Multiple output formats (image, JSON, base64)
-- **Reliability**: Uses established goQR.me API vs experimental solutions
-- **Maintainability**: Self-contained code vs multiple external dependencies
-- **Performance**: Direct API calls vs heavy QR generation libraries
-- **Portability**: Works on any PHP hosting vs specific server requirements
-- **Integration Ready**: Easy to integrate with existing systems via REST API
+**Made with ❤️ for the Thai digital payment ecosystem**
